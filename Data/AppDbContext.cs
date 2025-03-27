@@ -17,9 +17,9 @@ namespace Desafio.Data
             //base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Cliente>(x =>
             {
-                x.HasKey(e => e.IdCliente);
+                x.HasKey(e => e.Id);
 
-                x.Property(e => e.IdCliente).
+                x.Property(e => e.Id).
                 UseIdentityColumn()
                 .ValueGeneratedOnAdd();
                 x.ToTable("CLIENTE");

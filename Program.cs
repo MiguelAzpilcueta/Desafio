@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Desafio.Data;
 using System.Text.Json.Serialization;
+using Desafio.Service;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL")
         ?? throw new InvalidOperationException("Connection string 'CadenaSQL' not found."));
 });
+
+builder.Services.AddScoped<IClienteGuardarService, ClienteGuardarService>();
 
 var app = builder.Build();
 

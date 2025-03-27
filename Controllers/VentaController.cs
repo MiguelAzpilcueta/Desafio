@@ -70,7 +70,7 @@ namespace Desafio.Controllers
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, new { message = "El cliente no está registrado" });
                 }
-                venta.IdCliente = cliente.IdCliente;
+                venta.IdCliente = cliente.Id;
                 
                 var producto = _dbContext.Productos.FirstOrDefault(x => x.Id == venta.IdProducto);
 

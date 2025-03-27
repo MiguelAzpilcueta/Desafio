@@ -1,5 +1,8 @@
 ﻿using Desafio.Data;
+using Desafio.Dto;
 using Desafio.Models;
+using Desafio.Service;
+using Mapster;
 using Microsoft.AspNetCore.Mvc; 
 using Microsoft.EntityFrameworkCore;
 
@@ -7,17 +10,9 @@ namespace Desafio.Controllers
 {
     [ApiController]
     [Route("Cliente")]
-    public class ClienteController : Controller
-    {
-        public readonly AppDbContext _dbContext;
-
-        public ClienteController(AppDbContext context)
-        {
-            _dbContext = context;
-        }
-
-        [HttpGet]
-        [Route("Lista")]
+    public class ClienteController(AppDbContext _dbContext, IClienteGuardarService clienteGuardarService) : Controller
+    {    
+        [HttpGet]        
         public IActionResult listaCliente()
         {
             List<Cliente> clientes = new List<Cliente>();
@@ -33,7 +28,7 @@ namespace Desafio.Controllers
         }
 
         [HttpGet]
-        [Route("VerPorId")]
+        [Route ("{id}")]
         public IActionResult VerPorId(int id)
         {
             Cliente idClientes = _dbContext.Clientes.Find(id);
@@ -57,15 +52,24 @@ namespace Desafio.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("Crear")]
-        public IActionResult guardarCiente([FromBody] Cliente cliente )
+        [HttpPost]        
+        public async Task<IActionResult> guardarCiente([FromBody] ClienteDto clienteDto )
         {
             try
             {
-                _dbContext.Clientes.Add(cliente);
-                _dbContext.SaveChanges();
+                //Mapeo de un DTO a un Modelo (Mas facil)
+                var cliente = clienteDto.Adapt<Cliente>();
 
+                //Mapeo Manual de un DTO a un Modelo (Mtto de codigo mas dificil)
+                //Cliente cliente = new Cliente
+                //{
+                //    Nombre = clienteDto.Nombre,
+                //    Apellido = clienteDto.Apellido,
+                //    Direccion = clienteDto.Direccion,
+                //    Telefono = clienteDto.Telefono
+                //};
+                await clienteGuardarService.guardarCienteAsync(cliente);
+               
                 return StatusCode(StatusCodes.Status200OK, new { message = "ok" });
             }
             catch (Exception ex)
@@ -74,11 +78,10 @@ namespace Desafio.Controllers
             }            
         }
 
-        [HttpPut]
-        [Route("Editar")]
+        [HttpPut]        
         public IActionResult editarCiente([FromBody] Cliente cliente)
         {
-            Cliente clientedb = _dbContext.Clientes.Find(cliente.IdCliente);            
+            Cliente clientedb = _dbContext.Clientes.Find(cliente.Id);            
             try
             {                
                 if(clientedb == null)
@@ -87,10 +90,10 @@ namespace Desafio.Controllers
                 }
                 else
                 {
-                    clientedb.Nombre = cliente.Nombre is null ? clientedb.Nombre : cliente.Nombre;
-                    clientedb.Apellido = cliente.Apellido is null ? clientedb.Apellido : cliente.Apellido;
-                    clientedb.Direccion = cliente.Direccion is null ? clientedb.Direccion : cliente.Direccion;
-                    clientedb.Telefono = cliente.Telefono is null ? clientedb.Telefono : cliente.Telefono;
+                    clientedb.Nombre = cliente.Nombre;
+                    clientedb.Apellido = cliente.Apellido;
+                    clientedb.Direccion = cliente.Direccion;
+                    clientedb.Telefono = cliente.Telefono;
                 
                 _dbContext.SaveChanges();
                 }
@@ -103,8 +106,7 @@ namespace Desafio.Controllers
             }            
         }
 
-        [HttpDelete]
-        [Route("Eliminar")]
+        [HttpDelete]        
         public IActionResult eliminarCiente(int id)
         {
             Cliente clientedb = _dbContext.Clientes.Find(id);

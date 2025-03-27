@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Desafio.Models;
 
-public partial class Cliente
+public class Cliente
 {
-    public int IdCliente { get; set; }
+    public int Id { get; set; }
 
     public string? Nombre { get; set; }
 
@@ -14,5 +14,8 @@ public partial class Cliente
     public string? Direccion { get; set; }
 
     public string? Telefono { get; set; }
+    
+    //mejora
+    public Guid GUID { get; set; }
     
 }
